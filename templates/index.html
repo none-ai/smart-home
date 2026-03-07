@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SmartHome Hub</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: white; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { text-align: center; color: #00d4ff; }
+        .devices { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .device { background: #16213e; padding: 20px; border-radius: 15px; text-align: center; }
+        .device.on { border: 2px solid #00d4ff; }
+        .device h3 { margin: 10px 0; }
+        .toggle { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; }
+        .toggle.on { background: #00d4ff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 SmartHome Hub</h1>
+        <div class="devices" id="devices"></div>
+    </div>
+    <script>
+        fetch('/api/devices').then(r => r.json()).then(devices => {
+            document.getElementById('devices').innerHTML = devices.map(d => `
+                <div class="device ${d.on ? 'on' : ''}">
+                    <h3>${d.name}</h3>
+                    <p>${d.type}</p>
+                    <button class="toggle ${d.on ? 'on' : ''}" onclick="toggle(${d.id})">
+                        ${d.on ? 'ON' : 'OFF'}
+                    </button>
+                </div>
+            `).join('');
+        });
+        function toggle(id) {
+            fetch('/api/device/' + id, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({on: true})
+            }).then(() => location.reload());
+        }
+    </script>
+</body>
+</html>
